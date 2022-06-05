@@ -1,0 +1,4 @@
+-cpu=300HA:24
+-output="C:\WorkSpace\H8SIMV2\H8SIMV2\Debug\H8SIMV2.lib"
+-head=runtime
+-lang=c

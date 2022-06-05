@@ -1,0 +1,9 @@
+-cpu=300HN
+-lang=c
+-object="C:\WorkSpace\H8SIMV2\H8SIMV2\Debug\H8SIMV2.obj"
+-outcode=sjis
+-debug
+-nolist
+-chgincpath
+"C:\WorkSpace\H8SIMV2\H8SIMV2\H8SIMV2.c"
+-nologo

@@ -1,0 +1,10 @@
+-cpu=300HA:24
+-lang=c
+-object="C:\WorkSpace\H8SIMV2\H8SIMV2\Debug\public.obj"
+-outcode=sjis
+-debug
+-nolist
+-optimize=0
+-chgincpath
+"C:\WorkSpace\H8SIMV2\H8SIMV2\public.c"
+-nologo

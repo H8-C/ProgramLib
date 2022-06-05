@@ -1,0 +1,31 @@
+[HIMDBVersion]
+2.0
+[DATABASE_VERSION]
+"1.2" 
+[CURRENT_PROJECT]
+"H8SIMV2" 
+[GENERAL_DATA]
+[BREAKPOINTS]
+[OPEN_WORKSPACE_FILES]
+"C:\WorkSpace\H8SIMV2\H8SIMV2\intprg.c" 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\main.c" 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\public.c" 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\public.h" 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\ram_ext.h" 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\ram_pub.h" 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\resetprg.c" 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\stacksct.h" 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\typedefine.h" 
+[WORKSPACE_FILE_STATES]
+"C:\WorkSpace\H8SIMV2\H8SIMV2\intprg.c" 26 26 1034 379 0 8 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\main.c" 0 0 1206 716 0 0 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\public.c" -8 -31 1206 574 1 1 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\public.h" 0 0 596 641 0 4 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\ram_ext.h" 0 0 948 225 0 3 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\ram_pub.h" 0 0 986 546 0 2 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\resetprg.c" 52 52 430 257 0 7 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\stacksct.h" 0 0 430 257 0 5 
+"C:\WorkSpace\H8SIMV2\H8SIMV2\typedefine.h" 26 26 430 257 0 6 
+[LOADED_PROJECTS]
+"H8SIMV2" 
+[END]
