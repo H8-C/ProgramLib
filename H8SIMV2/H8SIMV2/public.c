@@ -6,6 +6,29 @@
 
 
 /*
+typedef union 
+{                                    
+	_U1		U1;                 
+	struct 
+	{                             
+		_U1	H:4;           
+		_U1	L:4;           
+	}BIT;                   
+}U_H1;                   
+
+typedef union 
+{                                    
+	_U4		U4;                 
+	struct 
+	{                             
+		_U1		 :4;
+		_U1		H:4;          
+		_U1		M:8;
+		_U1		L:4;          
+		_U1		 :8;          
+	}BIT;
+}U_SWAP;                   
+
 
 typedef union 
 {                                    
@@ -29,46 +52,17 @@ typedef struct
 }U_ET32;                   
 
 
+
 	U_ET32		R_ET32 ={0};
 
 
-
-		Fx_SET(	(_U1*)R_ET32.SRC , (_U1*)"00000000000000009999999999999999"  );
-		Fx_SET(	(_U1*)R_ET32.DES , (_U1*)"00000000000000009999999999999999"  );
-		Fx_DIV(	R_ET32 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//	Test BCD CALC   SRC[16] / DES[16] = ANS[16] .... REM[16]  ERR
+	Fx_SET(	(_U1*)R_ET32.SRC , (_U1*)"00000000000000009999999999999999"  );
+	Fx_SET(	(_U1*)R_ET32.DES , (_U1*)"00000000000000009999999999999999"  );
+	Fx_DIV(	R_ET32 );
 
 
 */
-
-
-
-
-
-
-
-
-
-
 
 
 #define		SIZE	16
@@ -88,7 +82,7 @@ void FxWait(_U2 time)
 @return		_U1
 @par	 	
 
-	src[] == drs[]   return  0  else  NOT 0
+	src[] == 0   return  0  else  NOT 0
 	
 */
 _U1	Fx_ZERO(_U1* src )
@@ -156,10 +150,9 @@ void	Fx_CLR(_U1* src )
 
 void	Fx_SFT_L(_U1* src  )
 {
-	U_SWAP	tmp;
+	U_SWAP	tmp	= 0;
 	_U1		cnt = SIZE-1;
 	
-	tmp.U4 		= 0;	
 	do
 	{
 		tmp.BIT.M 		= *(src+cnt);
@@ -183,34 +176,31 @@ void	Fx_SFT_L(_U1* src  )
 */
 void	Fx_SFT_R(_U1* src  )
 {
-	U_SWAP	tmp;
+	U_SWAP	tmp	= 0;
 	_U1		cnt = 0;
-	
-	tmp.U4 		= 0;	
 	for(cnt = 0 ; cnt < SIZE ; cnt++)
 	{
-		tmp.BIT.M 		= *(src+cnt);
-		tmp.U4   	  >>= 4;	
+		tmp.BIT.M 	= *(src+cnt);
+		tmp.U4   	>>= 4;	
 		*(src+cnt) 	= tmp.BIT.M;
-		tmp.BIT.H		= tmp.BIT.L;
+		tmp.BIT.H	= tmp.BIT.L;
 	}	
 }
 
 
 /*! 
-@brief	  	Fx_SET
+@brief	  	Fx_A2I1
 @param		_U1* src ,_U1* des
 @return		void
 @par	 	
 
-	SRC[] ＝ DES[]
+	SRC[] ＝ DES[H] - '0' + DES[L] - '0'
 	
 */
-void	Fx_SET(_U1* src ,_U1* des  )
+void	Fx_A2I1(_U1* src ,_U1* des  )
 {
 	U_H1	tmp;
 	_U1		cnt;
-		
 	for(cnt = 0 ; cnt < SIZE ; cnt++)
 	{
 		tmp.BIT.H 	= *des ;	des++;
@@ -232,7 +222,6 @@ void	Fx_SET(_U1* src ,_U1* des  )
 void	Fx_CPY(_U1* src ,_U1* des  )
 {
 	_U1		cnt;
-		
 	for(cnt = 0 ; cnt < SIZE ; cnt++)
 	{
 		*(src+cnt) 	= *(des+cnt);
@@ -246,12 +235,12 @@ void	Fx_CPY(_U1* src ,_U1* des  )
 @par	 	
 
 	SRC + DES = ANS
-	キャリ＝１は計算オーバー
-
+	
+	Carry = 1 is over calculation
 */
 
 
-void	Fx_ADD(U_ET32 *inp  )
+_U1	Fx_ADD(U_ET32 *inp  )
 {	
 	U_H1	tmp	= {0};
 	U_H1	CYA	= {0};
@@ -276,6 +265,7 @@ void	Fx_ADD(U_ET32 *inp  )
 				
 	}while(cnt--);	
 	inp->ERR.U1	= CYA.U1;
+	return 	inp->ERR.U1	;
 
 }
 
@@ -284,16 +274,18 @@ void	Fx_ADD(U_ET32 *inp  )
 @param		U_ET32 *inp
 @return		void
 @par	 	
-			BCD16BYTE減算
-			SRC[]　ー　DES[]　キャリ＝１は計算オーバー
+	BCD16BYTE subtraction
+	SRC []-DES [] Carry = 1 is overcalculated
 
 
-			SRC - DES = ANS
+	SRC-DES = ANS
 
-		引き算で―なら１０以上であるから　
-		上位から借りて下位は１０から引きます　＝　0x1A
-		0x100 - 0x1A =  0xE6　となります
-
+	If the subtraction is negative, it is 10 or more.
+	
+	Borrow from the top and subtract from 10 for the bottom = 0x1A
+	
+	0x100 --0x1A = 0xE6
+	
 */
 _U1	Fx_SUB(U_ET32 *inp  )
 {	
@@ -329,18 +321,18 @@ _U1	Fx_SUB(U_ET32 *inp  )
 @param		U_ET32 *inp
 @return		void
 @par	 	
-			BCD16BYTE乗算
-			SRC[]　*　DES[]　キャリ＝１は計算オーバー
+	BCD16BYTE multiplication
+	
+	SRC [] * DES [] Carry = 1 is over calculation
 
 
 	SRC * DES = ANS
 	
 	
-	加算時に　BCD補正が必要になります　
-
+	BCD correction is required at the time of addition
 
 */
-void	Fx_MUL(U_ET32 *inp  )
+_U1	Fx_MUL(U_ET32 *inp  )
 {	
 	U_H1	tmp	= {0};
 	U_H1	CYA	= {0};
@@ -383,6 +375,7 @@ void	Fx_MUL(U_ET32 *inp  )
 		Fx_SFT_L((_U1*)inp->MUL );	
 	}
 	inp->ERR.U1	= CYA.U1;
+	return 	inp->ERR.U1	;
 }
 
 /*! 
@@ -390,13 +383,13 @@ void	Fx_MUL(U_ET32 *inp  )
 @param		U_ET32 *inp
 @return		_U1
 @par	 	
-			除算で使用している
-			SRC　/　DES　　での　＞＝　なら　戻りは０	以外は　１とする
-			
-		引き算で―なら１０以上であるから　
-		上位から借りて下位は１０から引きます　＝　0x1A
-		0x100 - 0x1A =  0xE6　となります
-			
+	Used in division
+	If >= in SRC / DES, the return will be 1 except 0
+	
+	If the subtraction is negative, it is 10 or more.
+	
+	Borrow from the top and subtract from 10 for the bottom = 0x1A
+
 */
 _U1	Fx_SUB_CHK(U_ET32 *inp  )
 {	
@@ -407,7 +400,7 @@ _U1	Fx_SUB_CHK(U_ET32 *inp  )
 
 	//　TMP　=　MUL[]
 	Fx_CPY(	(_U1*)TMP, (_U1*)inp->MUL);
-	//  MUL[] - DIV[] - CYA
+	//  MUL[] - DIV[] - carry
 	do
 	{
 		tmp.U1	=(_U1) inp->MUL[cnt].BIT.L - inp->DIV[cnt].BIT.L  - CYA.BIT.L;		
@@ -418,21 +411,14 @@ _U1	Fx_SUB_CHK(U_ET32 *inp  )
 		if ( tmp.U1 >= 10 )		tmp.U1 -= 0xE6;
 		CYA.BIT.L	=  tmp.BIT.H;	inp->MUL[cnt].BIT.H	=  tmp.BIT.L;
 	}while(cnt--);	
-	// キャリ戻り
+	// carry 
 	inp->ERR.U1	= CYA.U1;
-	//　MUL[]をもどす
+	//　Returns MUL[]
 	Fx_CPY(	(_U1*)inp->MUL, (_U1*)TMP);
-	//　キャリがあれば　引けない
+	// carry 
 	return 	inp->ERR.U1	;
 }
 
-
-
-
-void	TEST(void)
-{
-	
-}
 
 
 /*! 
@@ -449,27 +435,25 @@ void	TEST(void)
 
 	SRC / DES = ANS	
 	
-	この割り算は　１６バイト配列です。
-	答えの算出は、小中で習った内容です
+	This division is a 16-byte array
 	
-		src[] と　DES[]　を頭を合わせて引く　何回引けるかが答え
-		
-	アルゴリズムは
-		
-		des[]をあらかじめ最大桁まで桁上げする　この桁上げ回数が後の計算の終端となる
-		
-		src[] -=　DES[]  を繰り返す回数が答え(ANS[])です
-		
-		引けなくなったら　DES[]  を　桁下げ　ANS[]を桁上げ
-		
-	これを繰り返す
+	The calculation of the answer is what I learned in the elementary school
 	
+	Draw src [] and DES [] head to head The answer is how many times you can pull
+	
+	The algorithm is
+	
+		Carry des [] up to the maximum digit in advance
+	
+		This number of carry will be the end of the later calculation
+	
+		The answer (ANS []) is the number of times src []-= DES [] is repeated
+	
+		If you cannot close, carry down DES [] and carry up ANS []
 
-
-
-
+	Repeat this
 */
-void	Fx_DIV(U_ET32 *inp  )
+_U1	Fx_DIV(U_ET32 *inp  )
 {	
 	U_H1	tmp	= {0};
 	U_H1	CYA	= {0};
@@ -477,7 +461,7 @@ void	Fx_DIV(U_ET32 *inp  )
 	_U1		LOP = 0;
 	_U1		KAI = 0;
 		
-	//初期化
+	//Initial
 	Fx_CLR( (_U1*) inp->ANS  );
 	Fx_CLR( (_U1*) inp->REM  );
 	Fx_CLR( (_U1*) inp->DIV  );
@@ -485,42 +469,44 @@ void	Fx_DIV(U_ET32 *inp  )
 	inp->ERR.U1	= 0;
 	
 	
-	//ワーク用
+	// Work
 	Fx_CPY(	(_U1*)inp->MUL , (_U1*)inp->SRC);
 	Fx_CPY(	(_U1*)inp->DIV , (_U1*)inp->DES);
 	
-	//　０割り？
+	//　Division by zero
 	if ( ! Fx_ZERO( (_U1*) inp->DES ) )
 	{
-		inp->ERR.U1	= 0x80;				return;
+		inp->ERR.U1	= 0x80;					
+		return 	inp->ERR.U1	;
 	}
-	//　X ＝＝Y　？
+	//　X == Y　
 	if ( ! Fx_EQR( (_U1*) inp->SRC ,(_U1*) inp->DES ) ) 
 	{
-		inp->ANS[SIZE-1].BIT.L	= 1;		return;
+		inp->ANS[SIZE-1].BIT.L	= 1;			
+		return 	inp->ERR.U1	;
 	}
-	//X ＜　Y　？
+	// X <　Y　
 	if ( Fx_SUB_CHK( inp  ) )
 	{
 		Fx_CLR( (_U1*) inp->ANS  );
 		Fx_CPY( (_U1*) inp->REM ,(_U1*) inp->SRC  );
-		return;
+		return 	inp->ERR.U1	;
 	}
-	//　桁上げ
+	//　divisor Carry Up
 	while(! inp->DIV[0].BIT.H)
 	{
 		Fx_SFT_L((_U1*)inp->DIV );	
 		LOP++;	
 	}	
-	//　桁下げ
+	//　Carry down
 	do	
 	{
-		//　答え
+		//　Answer Sift Left
 		Fx_SFT_L((_U1*)inp->ANS );	
-		//　X ＞＝　Y　なら　０
+		//　if X >= Y　then　0
 		while( ! Fx_SUB_CHK( inp )  )
 		{
-			//　配列　X=X-Y
+			//Array X[] -= Y[]
 			CYA.U1 		= 0;
 			tmp.U1 		= 0;	
 			cnt 		= SIZE-1;
@@ -535,14 +521,16 @@ void	Fx_DIV(U_ET32 *inp  )
 				CYA.BIT.L	=  tmp.BIT.H;	inp->MUL[cnt].BIT.H	=  tmp.BIT.L;
 			
 			}while(cnt--);	
-			// 答え回数＋＋
+			// Answer addition
 			inp->ANS[SIZE-1].BIT.L++;
 		}
-		// 除数桁下げ
+		// Divide digit down
 		Fx_SFT_R((_U1*)inp->DIV );
 	}while(LOP--);
-	// あまり
+	// Remaining value of subtraction
 	Fx_CPY(	(_U1*)inp->REM , (_U1*)inp->MUL);
-	// キャリー　
-	inp->ERR.U1	= CYA.U1;
+	// carry 
+	inp->ERR.U1	= CYA.U1;	
+	return 	inp->ERR.U1	;
+
 }

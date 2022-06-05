@@ -190,7 +190,7 @@ extern	void	Fx_SFT_L(_U1*   );
 
 extern	void	Fx_SFT_R(_U1*   );
 
-extern	void	Fx_SET(_U1*  ,_U1*   );
+extern	void	Fx_A2I1(_U1*  ,_U1*   );
 
 
 
